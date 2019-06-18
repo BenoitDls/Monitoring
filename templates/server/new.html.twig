@@ -1,28 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Server{% endblock %}
+{% block title %}Nouveau Serveur{% endblock %}
 
 {% block stylesheets %}
 
     <style>
         #form-server-create-container{
-            margin: 10% 20% 0% 20% !important;
+            margin: 5% 20% 5% 20% !important;
         }
     </style>
 
 {% endblock %}
 
 {% block body %}
+
     <div id="form-server-create-container">
 
         <h1 class="text-center">Ajouter un nouveau serveur</h1>
 
-        {{ form_start(form)}}
-        {{ form_widget(form) }}
-        {{ form_end(form) }}
-        <button class="btn">{{ button_label|default('Save') }}</button>
-        
-        <a href="{{ path('server_index') }}">back to list</a>
-
+        {{ include('server/_form.html.twig', {'button_label': 'Ajouter'}) }}
+    
     </div>
+
 {% endblock %}

@@ -1,13 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Server{% endblock %}
+{% block title %}Modification Serveur{% endblock %}
+
+{% block stylesheets %}
+
+    <style>
+        #form-server-create-container{
+            margin: 5% 20% 5% 20% !important;
+        }
+    </style>
+
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Server</h1>
 
-    {{ include('server/_form.html.twig', {'button_label': 'Update'}) }}
+    <div id="form-server-create-container">
 
-    <a href="{{ path('server_index') }}">back to list</a>
+        <h1 class="text-center">Modifier serveur</h1>
 
-    {{ include('server/_delete_form.html.twig') }}
+        {{ include('server/_form.html.twig', {'button_label': 'Modifier'}) }}
+
+        <div class="mt-3">
+            {{ include('server/_delete_form.html.twig') }}
+        </div>
+    
+    </div>
+
 {% endblock %}

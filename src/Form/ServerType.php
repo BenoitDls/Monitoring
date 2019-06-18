@@ -16,16 +16,22 @@ class ServerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('rsa_key', TextareaType::class, [
-                'required' => true
-            ])
+            ->add('rsa_key', TextareaType::class)
             ->add('host', TextType::class, [
                 'required' => true
             ])
-            ->add('port')
-            ->add('username')
-            ->add('password')
-            ->add('name')
+            ->add('port', NumberType::class, [
+                'required' => true,
+            ])
+            ->add('username', TextType::class, [
+                'required' => true,
+            ])
+            ->add('password', TextType::class, [
+                'required' => true,
+            ])
+            ->add('name', TextType::class, [
+                'required' => true,
+            ])
         ;
     }
 
