@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Server index{% endblock %}
+
+{% block body %}
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-3">
+        <h1 class="h3 mb-0 text-gray-800">Serveur</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-server fa-sm text-white-50"></i> Ajouter un serveur</a>
+    </div>
+
+    <div class="row">
+
+        {% for server in servers %}
+            <div class="col-xl-3 col-md-6 mb-4">
+                {% if server.is_online %}
+                <div class="card border-left-success shadow h-100 py-2">
+                {% else %}
+                <div class="card border-left-danger shadow h-100 py-2">
+                {% endif %}
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Linux</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><a href="{{ path('server_edit', {'id':1}) }}" style="text-decoration: none; color: inherit;">{{ server.name }}</a></div>
+                            </div>
+                            <div class="col-auto">
+                                {% if server.is_online %}
+                                <a href="#" data-toggle="modal" data-target="#terminal-modal"><i class="fas fa-terminal fa-2x text-gray-300"></i></a>
+                                <i class="fas fa-toggle-on fa-2x text-gray-300"></i>
+                                {% else %}
+                                <i class="fas fa-toggle-off fa-2x text-gray-300"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
+
+{% block modals %}
+
+    <div class="modal fade" id="terminal-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Terminal <i class="fas fa-terminal fa-sm"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="terminal-modal-body">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-grow my-5 text-primary" style="margin:0 auto;"id="terminal-modal-spinner" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+
+    $('#terminal-modal').on('shown.bs.modal', function () {
+
+        let url = "{{ path('terminal', {'id':'id'}) }}".replace("id", 1)
+
+        $('#terminal-modal-body').fadeOut('slow').load(url).fadeIn('slow', function(){
+
+            let terminalContainer = document.getElementById('terminal');
+            let shellprompt = '$ ';
+            let command = '';
+
+            let term = new Terminal();
+            term.open(terminalContainer);
+
+            term.prompt = function () {
+                term.write('\r\n' + shellprompt);
+            };
+
+            term.writeln('This is a local terminal emulation, without a real terminal in the back-end.');
+            term.writeln('Type some keys and commands to play around.');
+            term.writeln('');
+            term.prompt();
+
+            term.on('key', function (key, ev) {
+
+                let printable = (
+                    !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
+                );
+
+                if (ev.keyCode == 13) {
+                    term.prompt();
+                    if (command == "clear")
+                    {
+                        term.clear()
+                    }
+                    else {
+                        sendCommand(command, term)
+                    }
+                    command = '';
+                } else if (ev.keyCode == 8) {
+                    if (term.x > 2) {
+                        term.write('\b \b');
+                    }
+                } else if (printable) {
+                    command = command+key;
+                    term.write(key);
+                }
+            });
+
+            term.on('paste', function (data, ev) {
+                term.write(data);
+            });
+
+
+        })
+
+        function sendCommand(command, term){
+            let url = "{{ path('command', {'id':'id'}) }}".replace("id", 1)
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {'command' : command},
+            }).done(function(data) {
+                term.write(data.result);
+                term.prompt();
+                console.log(data)
+            });
+        };
+    })
+    
+    </script>
+
+{% endblock %}
